@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гид по визам для цифровых кочевников в Европе (2025)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Warm neutrals like bg-amber-50, with amber-500 and teal-600 as accents) -->
+    <!-- Application Structure Plan: A single-page dashboard. It starts with a hero section for context, followed by the main interactive tool: a horizontal bar chart comparing minimum income, which is the primary decision factor for users. This chart is coupled with filter buttons for direct country selection. Clicking either a chart bar or a button updates a dedicated "Detailed Information" panel below. This structure allows users to get a quick overview (comparison) and then drill down for details without leaving the context of the page. A final static section covers general requirements applicable to all. This design was chosen to facilitate a non-linear exploration, empowering users to compare and research based on their primary criteria (income) efficiently. -->
+    <!-- Visualization & Content Choices: 1. Minimum Income Data -> Goal: Compare -> Viz: Horizontal Bar Chart (Chart.js) -> Interaction: Click on bar updates detail view -> Justification: Best for comparing values across categories (countries) and provides an intuitive, visual entry point for exploration. 2. All Country-Specific Data (fees, taxes, etc.) -> Goal: Inform -> Presentation: Dynamic HTML card -> Interaction: Content updates on country selection via JS -> Justification: Organizes detailed information cleanly and avoids clutter, presenting only relevant data to the user. 3. Country List -> Goal: Organize/Navigate -> Presentation: Styled HTML Buttons -> Interaction: Click updates detail view and highlights active button -> Justification: Provides a clear, alternative navigation method for users who already know which country they're interested in. All choices confirmed to use Canvas/HTML/CSS, with NO SVG/Mermaid, to create a cohesive and interactive experience. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFAF0; 
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 500px;
+            }
+        }
+        .active-button {
+            background-color: #14B8A6 !important;
+            color: white !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <header class="text-center mb-10 md:mb-16">
+            <h1 class="text-3xl md:text-5xl font-bold text-teal-800 mb-2">Гид по визам для цифровых кочевников в Европе</h1>
+            <p class="text-lg md:text-xl text-gray-600 mt-2">Интерактивный инструмент для сравнения требований в 2025 году</p>
+        </header>
+
+        <main>
+            <section id="comparison-tool" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-10 md:mb-16">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl md:text-3xl font-bold text-teal-700 mb-2">Сравнение ключевых условий</h2>
+                    <p class="text-gray-600 max-w-3xl mx-auto">
+                        Начните ваше исследование здесь. Эта диаграмма показывает минимальный ежемесячный доход, необходимый для подачи заявления. Нажмите на столбец страны на графике или на кнопку ниже, чтобы увидеть все детали.
+                    </p>
+                </div>
+                
+                <div class="chart-container mb-8">
+                    <canvas id="incomeChart"></canvas>
+                </div>
+
+                <div id="country-filters" class="flex flex-wrap justify-center gap-2 md:gap-3 mb-8">
+                </div>
+            </section>
+
+            <section id="details-view" class="min-h-[400px] transition-opacity duration-500">
+                <div id="details-content" class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                </div>
+            </section>
+            
+            <section id="general-info" class="mt-10 md:mt-16">
+                <div class="bg-teal-50 border-l-4 border-teal-500 rounded-r-lg p-6 md:p-8">
+                     <h2 class="text-2xl md:text-3xl font-bold text-teal-700 mb-4">Общие требования</h2>
+                    <p class="text-gray-700 mb-6">
+                       Помимо индивидуальных требований каждой страны, существует общий набор документов и условий, который вам, скорее всего, потребуется. Подготовьтесь к этому заранее, чтобы упростить процесс подачи заявления.
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-3">✓</span>
+                            <p><strong class="font-semibold">Подтверждение удаленной работы:</strong> Действующий трудовой договор с компанией за пределами страны назначения, документы о регистрации собственного бизнеса (ИП/ООО) или подтверждение фриланс-деятельности с постоянными клиентами.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-3">✓</span>
+                             <p><strong class="font-semibold">Действующий загранпаспорт:</strong> Паспорт должен быть действителен как минимум 6 месяцев после окончания срока действия визы.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-600 font-bold mr-3">✓</span>
+                            <p><strong class="font-semibold">Отсутствие судимостей:</strong> Справка об отсутствии судимости из страны вашего гражданства и/или постоянного проживания за последние несколько лет.</p>
+                        </li>
+                        <li class="flex items-start">
+                           <span class="text-teal-600 font-bold mr-3">✓</span>
+                            <p><strong class="font-semibold">Подтверждение проживания:</strong> Договор аренды жилья или бронь отеля/апартаментов на первое время пребывания в стране.</p>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-200">
+            <p class="text-sm text-gray-500">
+                Информация актуальна на конец 2025 года. Требования могут меняться. Всегда проверяйте официальные сайты консульств перед подачей документов.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const visaData = [
+                {
+                    id: 'portugal',
+                    name: 'Португалия',
+                    flag: '🇵🇹',
+                    income: 3280,
+                    fee: 90,
+                    insurance: 'Да, полное покрытие',
+                    tax: 'Возможен льготный налоговый режим NHR (Non-Habitual Resident)',
+                    validity: '1 год, с возможностью продления до 5 лет',
+                    details: 'Одна из самых популярных виз D7/D8. Требует наличия португальского налогового номера (NIF) и счета в банке. Сравнительно простой процесс.'
+                },
+                {
+                    id: 'spain',
+                    name: 'Испания',
+                    flag: '🇪🇸',
+                    income: 2600,
+                    fee: 80,
+                    insurance: 'Да, частная страховка без доплат',
+                    tax: 'Специальный налоговый режим с фиксированной ставкой 24% на доходы до €600,000',
+                    validity: '1 год, продление до 5 лет',
+                    details: 'Относительно недавняя виза с привлекательным налоговым режимом. Требуется подтверждение квалификации или опыта работы не менее 3 лет.'
+                },
+                {
+                    id: 'italy',
+                    name: 'Италия',
+                    flag: '🇮🇹',
+                    income: 2800,
+                    fee: 116,
+                    insurance: 'Да, на весь срок пребывания',
+                    tax: 'Стандартное налогообложение, но возможны региональные льготы',
+                    validity: '1 год, можно продлить',
+                    details: 'Новая виза, запущена в 2024 году. Требуется высшее образование или 5 лет профессионального опыта. Процесс может быть бюрократическим.'
+                },
+                {
+                    id: 'croatia',
+                    name: 'Хорватия',
+                    flag: '🇭🇷',
+                    income: 2540,
+                    fee: 150,
+                    insurance: 'Да, покрытие на территории Хорватии',
+                    tax: 'Освобождение от уплаты подоходного налога в Хорватии',
+                    validity: '1 год, не продлевается (нужно выехать на 6 мес.)',
+                    details: 'Привлекательна полным освобождением от налогов. Заявление можно подать онлайн или уже находясь в стране. Не ведет к ПМЖ.'
+                },
+                {
+                    id: 'hungary',
+                    name: 'Венгрия',
+                    flag: '🇭🇺',
+                    income: 3000,
+                    fee: 110,
+                    insurance: 'Да, на 30,000 евро',
+                    tax: 'Освобождение от уплаты налогов в Венгрии в первые 6 месяцев',
+                    validity: '1 год, с возможностью продления еще на 1 год',
+                    details: 'Известна как "White Card". Низкие налоги и стоимость жизни. Заявитель не должен иметь долю в венгерской компании.'
+                },
+                {
+                    id: 'greece',
+                    name: 'Греция',
+                    flag: '🇬🇷',
+                    income: 3500,
+                    fee: 75,
+                    insurance: 'Да, полное покрытие',
+                    tax: 'Налоговая льгота: уплата налога только с 50% дохода в течение 7 лет',
+                    validity: '2 года, можно продлить',
+                    details: 'Более высокий порог входа, но компенсируется длительным сроком действия и значительной налоговой льготой. Можно привезти семью.'
+                },
+                {
+                    id: 'malta',
+                    name: 'Мальта',
+                    flag: '🇲🇹',
+                    income: 2700,
+                    fee: 300,
+                    insurance: 'Да, полное покрытие',
+                    tax: 'Освобождение от подоходного налога, но есть другие сборы',
+                    validity: '1 год, можно продлить',
+                    details: 'Nomad Residence Permit. Высокая стоимость сбора, но англоязычная среда и хорошее расположение. Процесс полностью онлайн.'
+                },
+                 {
+                    id: 'germany',
+                    name: 'Германия',
+                    flag: '🇩🇪',
+                    income: null, 
+                    fee: 100,
+                    insurance: 'Да, немецкая мед. страховка',
+                    tax: 'Полное налоговое резидентство с первого дня',
+                    validity: 'До 3 лет',
+                    details: 'Технически это виза для фрилансеров (Freiberufler), а не "nomad visa". Нет четкого порога дохода, но нужно доказать финансовую состоятельность для покрытия расходов. Требуется подтверждение связи с немецкими клиентами.'
+                }
+            ];
+
+            const countryFiltersContainer = document.getElementById('country-filters');
+            const detailsContent = document.getElementById('details-content');
+            const ctx = document.getElementById('incomeChart').getContext('2d');
+            let incomeChart;
+
+            function formatIncome(value) {
+                if (value === null) return 'Нет точных данных';
+                return `€${value.toLocaleString('ru-RU')}`;
+            }
+
+            function updateDetails(countryId) {
+                const country = visaData.find(c => c.id === countryId);
+                if (!country) return;
+
+                detailsContent.parentElement.style.opacity = 0;
+
+                setTimeout(() => {
+                    detailsContent.innerHTML = `
+                        <div class="flex flex-col md:flex-row items-start md:items-center mb-6">
+                            <h2 class="text-3xl md:text-4xl font-bold text-teal-700 mr-4">${country.flag} ${country.name}</h2>
+                        </div>
+                        <p class="text-gray-600 mb-8 max-w-3xl">${country.details}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="bg-amber-50 p-5 rounded-lg">
+                                <p class="text-sm text-amber-800 font-semibold mb-1">Мин. доход в месяц</p>
+                                <p class="text-2xl font-bold text-amber-900">${country.income ? formatIncome(country.income) : 'Гибкие требования'}</p>
+                            </div>
+                            <div class="bg-teal-50 p-5 rounded-lg">
+                                <p class="text-sm text-teal-800 font-semibold mb-1">Визовый сбор</p>
+                                <p class="text-2xl font-bold text-teal-900">~ €${country.fee}</p>
+                            </div>
+                            <div class="bg-rose-50 p-5 rounded-lg">
+                                <p class="text-sm text-rose-800 font-semibold mb-1">Срок действия</p>
+                                <p class="text-2xl font-bold text-rose-900">${country.validity}</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 border-t pt-6">
+                             <h3 class="text-xl font-bold text-gray-700 mb-4">Ключевые моменты</h3>
+                             <ul class="space-y-3 text-gray-700">
+                                <li class="flex"><strong class="w-32 shrink-0">Страховка:</strong><span>${country.insurance}</span></li>
+                                <li class="flex"><strong class="w-32 shrink-0">Налоги:</strong><span>${country.tax}</span></li>
+                             </ul>
+                        </div>
+                    `;
+                     detailsContent.parentElement.style.opacity = 1;
+                }, 300);
+
+                document.querySelectorAll('#country-filters button').forEach(btn => {
+                    btn.classList.remove('active-button');
+                    if (btn.dataset.country === countryId) {
+                        btn.classList.add('active-button');
+                    }
+                });
+            }
+
+            function createChart() {
+                const chartData = visaData.filter(c => c.income !== null);
+                
+                incomeChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.map(c => c.name),
+                        datasets: [{
+                            label: 'Минимальный ежемесячный доход (€)',
+                            data: chartData.map(c => c.income),
+                            backgroundColor: 'rgba(20, 184, 166, 0.7)',
+                            borderColor: 'rgba(15, 118, 110, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ` ${context.dataset.label}: ${formatIncome(context.raw)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Сумма в евро (€)'
+                                }
+                            }
+                        },
+                        onClick: (event) => {
+                           const points = incomeChart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+                            if (points.length) {
+                                const firstPoint = points[0];
+                                const label = incomeChart.data.labels[firstPoint.index];
+                                const country = visaData.find(c => c.name === label);
+                                if (country) {
+                                    updateDetails(country.id);
+                                     document.getElementById('details-view').scrollIntoView({ behavior: 'smooth' });
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            visaData.forEach(country => {
+                const button = document.createElement('button');
+                button.className = 'px-4 py-2 text-sm md:text-base font-medium text-teal-700 bg-white border border-teal-200 rounded-full hover:bg-teal-50 transition-colors duration-200';
+                button.textContent = `${country.flag} ${country.name}`;
+                button.dataset.country = country.id;
+                button.addEventListener('click', () => {
+                    updateDetails(country.id);
+                });
+                countryFiltersContainer.appendChild(button);
+            });
+
+            createChart();
+            updateDetails(visaData[0].id);
+        });
+    </script>
+</body>
+</html>
