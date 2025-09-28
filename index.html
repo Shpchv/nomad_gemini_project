@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Chosen Palette: Calm Harmony (Warm neutrals like bg-amber-50, with olive green for land and teal-600 as accents) -->
-    <!-- Application Structure Plan: Single-page dashboard. The map is replaced by an interactive Carousel, where each slide presents key summary data (Population, Economy, Climate, English Proficiency) in a concise card format. This structure prioritizes comparison and discovery via linear iteration. Clicking a navigation button or the "Details" button in the carousel triggers the `updateDetails(countryId)` function to synchronize with the detailed, tabbed information panel below. -->
+    <!-- Application Structure Plan: Single-page dashboard. The map is replaced by an interactive Carousel, where each slide presents key summary data (Population, Economy, Climate, English Proficiency) in a concise card format. This structure prioritizes comparison and discovery via linear iteration. Clicking a navigation button or the "Details" button in the carousel triggers the `updateDetails(countryId)` function to synchronize with the detailed, tabbed information panel below. The layout is now fully responsive, using reduced padding and smaller text sizes on mobile (sm:) breakpoints. -->
     <!-- Visualization & Content Choices: 1. Country Summary Data -> Goal: Inform/Compare/Organize -> Viz: Interactive Card Carousel (HTML/CSS/JS) -> Interaction: Next/Prev buttons, direct click on card, sync with detail view -> Justification: Offers a structured, digestible, and engaging method for reviewing high-level qualitative and quantitative criteria. 2. All Country-Specific Data (CoL, Rent, Safety, etc.) -> Goal: Inform/Organize -> Presentation: Dynamic HTML card with Tabs (Finances, Logistics, Lifestyle) -> Interaction: Tabs switch structured content via JS -> Justification: Effectively manages the high volume of detailed, structured data points. All choices confirmed to use HTML/CSS/JS, with NO SVG/Mermaid. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -34,7 +34,7 @@
 
         .carousel-slide {
             flex: 0 0 100%; /* Каждый слайд занимает 100% ширины контейнера */
-            padding: 1rem;
+            padding: 0.5rem; /* Уменьшаем padding на мобильных */
             box-sizing: border-box;
         }
 
@@ -48,6 +48,16 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            padding: 1.5rem; /* Меньше padding на мобильных */
+        }
+        
+        @media (min-width: 768px) {
+             .carousel-slide {
+                padding: 1rem; /* Стандартный padding на десктопе */
+            }
+             .slide-card {
+                padding: 2rem;
+            }
         }
         
         .slide-card:hover {
@@ -62,19 +72,25 @@
             z-index: 20;
             background-color: rgba(255, 255, 255, 0.7);
             border: none;
-            padding: 0.75rem;
+            padding: 0.5rem; /* Меньше padding на кнопках на мобильных */
             border-radius: 9999px;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s;
+        }
+        
+        @media (min-width: 768px) {
+            .carousel-nav-button {
+                padding: 0.75rem;
+            }
         }
 
         .carousel-nav-button:hover {
             background-color: rgba(255, 255, 255, 0.9);
         }
 
-        #prev-button { left: 1rem; }
-        #next-button { right: 1rem; }
+        #prev-button { left: 0.5rem; }
+        #next-button { right: 0.5rem; }
 
         /* --- General Styling --- */
         .active-button {
@@ -91,24 +107,24 @@
 </head>
 <body class="text-gray-800">
 
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-12">
 
-        <header class="text-center mb-10 md:mb-16">
-            <h1 class="text-3xl md:text-5xl font-bold text-teal-800 mb-2">Гид по визам для цифровых кочевников в Европе</h1>
-            <p class="text-lg md:text-xl text-gray-600 mt-2">Полное сравнение требований, стоимости жизни и логистики в 2025 году</p>
+        <header class="text-center mb-6 md:mb-10">
+            <h1 class="text-3xl md:text-5xl font-bold text-teal-800 mb-1">Гид по визам для цифровых кочевников в Европе</h1>
+            <p class="text-base md:text-xl text-gray-600 mt-2">Полное сравнение требований, стоимости жизни и логистики в 2025 году</p>
         </header>
 
         <main>
-            <section id="comparison-tool" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-10 md:mb-16">
-                <div class="text-center mb-8">
-                    <h2 class="text-2xl md:text-3xl font-bold text-teal-700 mb-2">Обзор стран: Факторы жизни и работы</h2>
-                    <p class="text-gray-600 max-w-3xl mx-auto">
+            <section id="comparison-tool" class="bg-white rounded-2xl shadow-lg p-4 md:p-8 mb-8 md:mb-16">
+                <div class="text-center mb-6">
+                    <h2 class="text-xl md:text-3xl font-bold text-teal-700 mb-2">Обзор стран: Факторы жизни и работы</h2>
+                    <p class="text-sm md:text-base text-gray-600 max-w-3xl mx-auto">
                         Используйте карусель, чтобы быстро сравнить основные показатели стран, включая население, экономику и климат.
                     </p>
                 </div>
                 
                 <!-- Карусель стран -->
-                <div class="carousel-container mb-8 max-w-4xl mx-auto">
+                <div class="carousel-container mb-6 max-w-4xl mx-auto">
                     <div id="carousel-track" class="carousel-track h-[300px] md:h-[350px]">
                         <!-- Слайды будут сгенерированы JavaScript -->
                     </div>
@@ -121,24 +137,24 @@
                 </div>
                 <!-- Конец карусели -->
 
-                <div id="country-filters" class="flex flex-wrap justify-center gap-2 md:gap-3 mb-8">
+                <div id="country-filters" class="flex flex-wrap justify-center gap-2 md:gap-3 mb-4">
                     <!-- Кнопки-фильтры будут сгенерированы JavaScript -->
                 </div>
             </section>
 
             <section id="details-view" class="min-h-[600px] transition-opacity duration-500">
-                <div id="details-content" class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+                <div id="details-content" class="bg-white rounded-2xl shadow-xl p-4 md:p-8">
                     <!-- Детали будут загружены сюда -->
                 </div>
             </section>
             
-            <section id="general-info" class="mt-10 md:mt-16">
-                <div class="bg-teal-50 border-l-4 border-teal-500 rounded-r-lg p-6 md:p-8">
-                     <h2 class="text-2xl md:text-3xl font-bold text-teal-700 mb-4">Общие требования</h2>
-                    <p class="text-gray-700 mb-6">
+            <section id="general-info" class="mt-8 md:mt-16">
+                <div class="bg-teal-50 border-l-4 border-teal-500 rounded-r-lg p-4 md:p-8">
+                     <h2 class="text-xl md:text-3xl font-bold text-teal-700 mb-4">Общие требования</h2>
+                    <p class="text-sm md:text-base text-gray-700 mb-6">
                        Необходимый минимум, который потребуется вам для любой визы цифрового кочевника в Европе.
                     </p>
-                    <ul class="space-y-4">
+                    <ul class="space-y-4 text-sm md:text-base">
                         <li class="flex items-start">
                             <span class="text-teal-600 font-bold mr-3">✓</span>
                             <p><strong class="font-semibold">Подтверждение удаленной работы:</strong> Действующий трудовой договор с компанией за пределами страны или документы о регистрации собственного бизнеса.</p>
@@ -160,8 +176,8 @@
             </section>
         </main>
 
-        <footer class="text-center mt-12 py-6 border-t border-gray-200">
-            <p class="text-sm text-gray-500">
+        <footer class="text-center mt-8 py-4 border-t border-gray-200">
+            <p class="text-xs md:text-sm text-gray-500">
                 Информация является оценочной и основана на данных за 2025 год. Требования могут меняться.
             </p>
         </footer>
@@ -193,7 +209,6 @@
                 citizenship: '5 лет проживания с ВНЖ, затем подача на гражданство (требуется знание языка).',
                 venue: 'Консульство Португалии в стране проживания.',
                 processTime: '60-90 дней.',
-                // Новые данные для карусели
                 population: '10.3 млн',
                 economy: '~€25k ВВП/чел',
                 climate: 'Средиземноморский, мягкий',
@@ -386,7 +401,6 @@
             const offset = -currentIndex * 100;
             carouselTrack.style.transform = `translateX(${offset}%)`;
 
-            // Синхронизация с нижним блоком деталей
             updateDetails(visaData[currentIndex].id);
         }
 
@@ -405,18 +419,17 @@
                 slide.className = 'carousel-slide';
                 slide.setAttribute('data-index', index);
                 
-                // Внутреннее содержимое карточки
                 slide.innerHTML = `
-                    <div class="slide-card p-6 md:p-8">
+                    <div class="slide-card">
                         <div>
                             <div class="flex items-center justify-between mb-4 border-b pb-3">
-                                <h3 class="text-2xl font-bold text-teal-800">${country.flag} ${country.name}</h3>
-                                <div class="text-lg font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full shadow-md">
-                                    ${formatIncome(country.income)} <span class="text-sm font-normal text-amber-600"> / мес.</span>
+                                <h3 class="text-xl md:text-2xl font-bold text-teal-800">${country.flag} ${country.name}</h3>
+                                <div class="text-base font-bold text-amber-700 bg-amber-100 px-2 py-1 rounded-full shadow-md">
+                                    ${formatIncome(country.income)} <span class="text-xs font-normal text-amber-600"> / мес.</span>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4 text-sm md:text-base">
+                            <div class="grid grid-cols-2 gap-y-3 gap-x-2 text-xs md:text-sm">
                                 <div class="flex items-center space-x-2">
                                     <span class="text-teal-600">👥</span>
                                     <div>
@@ -448,8 +461,8 @@
                             </div>
                         </div>
 
-                        <div class="mt-6 flex justify-center">
-                            <button data-country="${country.id}" class="update-detail-btn px-6 py-2 bg-teal-600 text-white rounded-full font-semibold hover:bg-teal-700 transition-colors shadow-md">
+                        <div class="mt-4 flex justify-center">
+                            <button data-country="${country.id}" class="update-detail-btn px-5 py-2 text-sm bg-teal-600 text-white rounded-full font-semibold hover:bg-teal-700 transition-colors shadow-md">
                                 Показать подробнее
                             </button>
                         </div>
@@ -459,43 +472,41 @@
             });
         }
 
-        // ------------------ Функции для отображения деталей (остались прежними) ------------------
-
         function createFinanceTabContent(country) {
             return `
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="bg-amber-50 p-5 rounded-lg border-l-4 border-amber-500">
-                        <p class="text-sm text-amber-800 font-semibold mb-1">Мин. доход в месяц</p>
-                        <p class="text-2xl font-bold text-amber-900">${formatIncome(country.income)}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <div class="bg-amber-50 p-4 rounded-lg border-l-4 border-amber-500">
+                        <p class="text-xs md:text-sm text-amber-800 font-semibold mb-1">Мин. доход в месяц</p>
+                        <p class="text-xl md:text-2xl font-bold text-amber-900">${formatIncome(country.income)}</p>
                         <p class="text-xs text-amber-700 mt-1">Визовое требование</p>
                     </div>
-                    <div class="bg-teal-50 p-5 rounded-lg border-l-4 border-teal-500">
-                        <p class="text-sm text-teal-800 font-semibold mb-1">Визовый сбор</p>
-                        <p class="text-2xl font-bold text-teal-900">~ €${country.fee}</p>
+                    <div class="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
+                        <p class="text-xs md:text-sm text-teal-800 font-semibold mb-1">Визовый сбор</p>
+                        <p class="text-xl md:text-2xl font-bold text-teal-900">~ €${country.fee}</p>
                          <p class="text-xs text-teal-700 mt-1">Разовый платеж</p>
                     </div>
-                    <div class="bg-indigo-50 p-5 rounded-lg border-l-4 border-indigo-500">
-                        <p class="text-sm text-indigo-800 font-semibold mb-1">Налог на доход</p>
-                        <p class="text-base font-bold text-indigo-900">${country.tax.split(':')[0]}</p>
+                    <div class="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-500">
+                        <p class="text-xs md:text-sm text-indigo-800 font-semibold mb-1">Налог на доход</p>
+                        <p class="text-sm md:text-base font-bold text-indigo-900">${country.tax.split(':')[0]}</p>
                         <p class="text-xs text-indigo-700 mt-1">${country.tax.split(':')[1] || country.tax}</p>
                     </div>
                 </div>
 
-                <h4 class="text-xl font-bold text-gray-700 mt-8 mb-2 border-b pb-2">Оценочная стоимость жизни (мес.)</h4>
-                <p class="text-sm text-gray-600 mb-4">
+                <h4 class="text-lg md:text-xl font-bold text-gray-700 mt-6 md:mt-8 mb-2 border-b pb-2">Оценочная стоимость жизни (мес.)</h4>
+                <p class="text-xs md:text-sm text-gray-600 mb-4">
                     Расчет стоимости без учета аренды включает: <strong class="text-teal-700">продукты питания, коммунальные услуги, интернет, мобильную связь, базовые развлечения и транспорт.</strong>
                 </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-3">
-                        <p class="text-lg font-semibold text-gray-800">Без учета аренды</p>
-                        <ul class="space-y-2 text-gray-700">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm md:text-base">
+                    <div class="space-y-2 md:space-y-3">
+                        <p class="text-base font-semibold text-gray-800">Без учета аренды</p>
+                        <ul class="space-y-1 md:space-y-2 text-gray-700">
                             <li><strong class="font-bold text-teal-600">Один человек:</strong> €${country.col1p.toLocaleString('ru-RU')}</li>
                             <li><strong class="font-bold text-teal-600">Два человека:</strong> €${country.col2p.toLocaleString('ru-RU')}</li>
                         </ul>
                     </div>
-                    <div class="space-y-3">
-                        <p class="text-lg font-semibold text-gray-800">Основные расходы</p>
-                        <ul class="space-y-2 text-gray-700">
+                    <div class="space-y-2 md:space-y-3">
+                        <p class="text-base font-semibold text-gray-800">Основные расходы</p>
+                        <ul class="space-y-1 md:space-y-2 text-gray-700">
                             <li><strong class="font-bold text-amber-600">Аренда (1-bed центр):</strong> ~ €${country.rent.toLocaleString('ru-RU')}</li>
                             <li><strong class="font-bold text-amber-600">Еда (1 чел.):</strong> ~ €${country.food}</li>
                             <li><strong class="font-bold text-amber-600">Проезд:</strong> ~ €${country.transport} (проездной)</li>
@@ -507,47 +518,47 @@
 
         function createLogisticsTabContent(country) {
             return `
-                <h4 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Процесс и сроки</h4>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-gray-50 p-5 rounded-lg border-l-4 border-gray-400">
-                        <p class="text-sm text-gray-600 font-semibold mb-1">Место подачи</p>
-                        <p class="text-base font-bold text-gray-800">${country.venue}</p>
+                <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4 border-b pb-2">Процесс и сроки</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-sm">
+                    <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-400">
+                        <p class="text-xs text-gray-600 font-semibold mb-1">Место подачи</p>
+                        <p class="text-sm md:text-base font-bold text-gray-800">${country.venue}</p>
                     </div>
-                    <div class="bg-gray-50 p-5 rounded-lg border-l-4 border-gray-400">
-                        <p class="text-sm text-gray-600 font-semibold mb-1">Срок оформления</p>
-                        <p class="text-base font-bold text-gray-800">${country.processTime}</p>
+                    <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-400">
+                        <p class="text-xs text-gray-600 font-semibold mb-1">Срок оформления</p>
+                        <p class="text-sm md:text-base font-bold text-gray-800">${country.processTime}</p>
                     </div>
-                    <div class="bg-gray-50 p-5 rounded-lg border-l-4 border-gray-400">
-                        <p class="text-sm text-gray-600 font-semibold mb-1">Первичный срок</p>
-                        <p class="text-base font-bold text-gray-800">${country.validity}</p>
+                    <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-400">
+                        <p class="text-xs text-gray-600 font-semibold mb-1">Первичный срок</p>
+                        <p class="text-sm md:text-base font-bold text-gray-800">${country.validity}</p>
                     </div>
                 </div>
                 
-                <h4 class="text-xl font-bold text-teal-700 mt-8 mb-4 border-b pb-2">Перспективы гражданства</h4>
-                <div class="bg-teal-50 p-5 rounded-lg">
-                    <p class="text-base font-bold text-teal-800 mb-2">Путь:</p>
+                <h4 class="text-lg md:text-xl font-bold text-teal-700 mt-6 md:mt-8 mb-4 border-b pb-2">Перспективы гражданства</h4>
+                <div class="bg-teal-50 p-4 rounded-lg text-sm md:text-base">
+                    <p class="text-sm md:text-base font-bold text-teal-800 mb-2">Путь:</p>
                     <p class="text-gray-700">${country.citizenship}</p>
-                    <p class="text-sm text-teal-700 mt-2">Важно: ВНЖ через визу кочевника обычно засчитывается в срок для получения ПМЖ/гражданства, но есть исключения (например, Хорватия).</p>
+                    <p class="text-xs md:text-sm text-teal-700 mt-2">Важно: ВНЖ через визу кочевника обычно засчитывается в срок для получения ПМЖ/гражданства, но есть исключения (например, Хорватия).</p>
                 </div>
             `;
         }
 
         function createLifestyleTabContent(country) {
             return `
-                <h4 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Безопасность и среда</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-teal-50 p-5 rounded-lg border-l-4 border-teal-500">
-                        <p class="text-sm text-teal-800 font-semibold mb-1">Уровень безопасности</p>
-                        <p class="text-base font-bold text-teal-900">${country.safety}</p>
+                <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4 border-b pb-2">Безопасность и среда</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm">
+                    <div class="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
+                        <p class="text-xs md:text-sm text-teal-800 font-semibold mb-1">Уровень безопасности</p>
+                        <p class="text-sm md:text-base font-bold text-teal-900">${country.safety}</p>
                     </div>
-                    <div class="bg-amber-50 p-5 rounded-lg border-l-4 border-amber-500">
-                        <p class="text-sm text-amber-800 font-semibold mb-1">Медицинское страхование</p>
-                        <p class="text-base font-bold text-amber-900">${country.insurance}</p>
+                    <div class="bg-amber-50 p-4 rounded-lg border-l-4 border-amber-500">
+                        <p class="text-xs md:text-sm text-amber-800 font-semibold mb-1">Медицинское страхование</p>
+                        <p class="text-sm md:text-base font-bold text-amber-900">${country.insurance}</p>
                     </div>
                 </div>
 
-                <h4 class="text-xl font-bold text-gray-700 mt-8 mb-4 border-b pb-2">Дополнительные сведения</h4>
-                <div class="bg-white p-5 rounded-lg border border-gray-200">
+                <h4 class="text-lg md:text-xl font-bold text-gray-700 mt-6 md:mt-8 mb-4 border-b pb-2">Дополнительные сведения</h4>
+                <div class="bg-white p-4 rounded-lg border border-gray-200 text-sm md:text-base">
                     <p class="text-gray-700">${country.details}</p>
                 </div>
             `;
@@ -561,15 +572,15 @@
 
             setTimeout(() => {
                 detailsContent.innerHTML = `
-                    <div class="flex flex-col md:flex-row items-start md:items-center mb-6">
-                        <h2 class="text-3xl md:text-4xl font-bold text-teal-700 mr-4">${country.flag} ${country.name}</h2>
+                    <div class="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6">
+                        <h2 class="text-2xl md:text-4xl font-bold text-teal-700 mr-4">${country.flag} ${country.name}</h2>
                     </div>
-                    <p class="text-gray-600 mb-8 max-w-3xl">${country.details}</p>
+                    <p class="text-sm md:text-base text-gray-600 mb-6 md:mb-8 max-w-3xl">${country.details}</p>
 
-                    <div id="tabs-container" class="flex border-b border-gray-200 mb-6">
-                        <button data-tab="finances" class="tab-button py-2 px-4 text-gray-500 hover:text-teal-600 transition-colors duration-200">Финансы</button>
-                        <button data-tab="logistics" class="tab-button py-2 px-4 text-gray-500 hover:text-teal-600 transition-colors duration-200">Логистика</button>
-                        <button data-tab="lifestyle" class="tab-button py-2 px-4 text-gray-500 hover:text-teal-600 transition-colors duration-200">Образ жизни</button>
+                    <div id="tabs-container" class="flex border-b border-gray-200 mb-4 md:mb-6 overflow-x-auto whitespace-nowrap">
+                        <button data-tab="finances" class="tab-button py-2 px-3 md:px-4 text-sm md:text-base text-gray-500 hover:text-teal-600 transition-colors duration-200">Финансы</button>
+                        <button data-tab="logistics" class="tab-button py-2 px-3 md:px-4 text-sm md:text-base text-gray-500 hover:text-teal-600 transition-colors duration-200">Логистика</button>
+                        <button data-tab="lifestyle" class="tab-button py-2 px-3 md:px-4 text-sm md:text-base text-gray-500 hover:text-teal-600 transition-colors duration-200">Образ жизни</button>
                     </div>
 
                     <div id="tab-content" class="min-h-[300px]">
@@ -603,20 +614,18 @@
                     });
                 });
 
-                // Activate default tab
                 switchTab('finances');
                 
                 detailsContent.parentElement.style.opacity = 1;
             }, 300);
 
-            // Обновление кнопок фильтров
             document.querySelectorAll('#country-filters button').forEach(btn => {
                 btn.classList.remove('active-button');
                 if (btn.dataset.country === countryId) {
                     btn.classList.add('active-button');
                 }
             });
-            // Обновление состояния карусели
+
             const newIndex = visaData.findIndex(c => c.id === countryId);
             if (newIndex !== -1 && newIndex !== currentIndex) {
                 currentIndex = newIndex;
@@ -629,15 +638,15 @@
             const nextButton = document.getElementById('next-button');
 
             createCarousel();
-            showSlide(0); // Инициализация первого слайда и деталей
+            showSlide(0);
 
             prevButton.addEventListener('click', prevSlide);
             nextButton.addEventListener('click', nextSlide);
 
-            // Создание кнопок-фильтров под каруселью
             visaData.forEach(country => {
                 const button = document.createElement('button');
-                button.className = 'px-4 py-2 text-sm md:text-base font-medium text-teal-700 bg-white border border-teal-200 rounded-full hover:bg-teal-50 transition-colors duration-200';
+                // Уменьшаем размер кнопок на мобильных
+                button.className = 'px-3 py-1.5 text-xs md:text-sm font-medium text-teal-700 bg-white border border-teal-200 rounded-full hover:bg-teal-50 transition-colors duration-200';
                 button.textContent = `${country.flag} ${country.name}`;
                 button.dataset.country = country.id;
                 button.addEventListener('click', () => {
@@ -646,7 +655,6 @@
                 countryFiltersContainer.appendChild(button);
             });
             
-            // Обработчик клика для кнопок "Показать подробнее" в карусели
             document.querySelectorAll('.update-detail-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const countryId = e.target.dataset.country;
