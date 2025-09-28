@@ -5,33 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Гид по визам для цифровых кочевников в Европе (2025)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Calm Harmony (Warm neutrals like bg-amber-50, with amber-500 and teal-600 as accents) -->
-    <!-- Application Structure Plan: A single-page dashboard. The core remains the interactive bar chart comparing minimum income, serving as the main entry point. The country selection buttons provide an alternative navigation path. The critical update is the "Detailed Information" panel, which now uses a three-tabbed structure (Финансы, Логистика, Образ жизни) to organize the massive influx of new structured data (CoL, Rent, Safety, Citizenship, Application Process) clearly. This tabbed approach maintains the single-page flow while allowing deep, structured exploration of specific topics for a selected country. -->
-    <!-- Visualization & Content Choices: 1. Minimum Income Data -> Goal: Compare -> Viz: Horizontal Bar Chart (Chart.js) -> Interaction: Click on bar updates detail view -> Justification: Best for comparing the most critical quantitative factor. 2. All Country-Specific Data (fees, taxes, CoL, etc.) -> Goal: Inform/Organize -> Presentation: Dynamic HTML card with Tabs -> Interaction: Tabs switch structured content via JS -> Justification: The most effective method to present a large, structured dataset (logistics, finances, lifestyle) in a limited screen area without clutter. 3. Country List -> Goal: Organize/Navigate -> Presentation: Styled HTML Buttons -> Interaction: Click updates details and highlights button -> Justification: Clear, secondary navigation. All choices confirmed to use Canvas/HTML/CSS, with NO SVG/Mermaid. -->
+    
+    <!-- Chosen Palette: Calm Harmony (Warm neutrals like bg-amber-50, with olive green for land and teal-600 as accents) -->
+    <!-- Application Structure Plan: Single-page dashboard. The map is replaced by an interactive Carousel, where each slide presents key summary data (Population, Economy, Climate, English Proficiency) in a concise card format. This structure prioritizes comparison and discovery via linear iteration. Clicking a navigation button or the "Details" button in the carousel triggers the `updateDetails(countryId)` function to synchronize with the detailed, tabbed information panel below. -->
+    <!-- Visualization & Content Choices: 1. Country Summary Data -> Goal: Inform/Compare/Organize -> Viz: Interactive Card Carousel (HTML/CSS/JS) -> Interaction: Next/Prev buttons, direct click on card, sync with detail view -> Justification: Offers a structured, digestible, and engaging method for reviewing high-level qualitative and quantitative criteria. 2. All Country-Specific Data (CoL, Rent, Safety, etc.) -> Goal: Inform/Organize -> Presentation: Dynamic HTML card with Tabs (Finances, Logistics, Lifestyle) -> Interaction: Tabs switch structured content via JS -> Justification: Effectively manages the high volume of detailed, structured data points. All choices confirmed to use HTML/CSS/JS, with NO SVG/Mermaid. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #FFFAF0; 
         }
-        .chart-container {
-            position: relative;
+
+        /* --- Carousel Styling --- */
+        .carousel-container {
+            overflow: hidden;
             width: 100%;
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 400px;
-            max-height: 50vh;
+            border-radius: 1rem;
+            position: relative;
         }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 500px;
-            }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
         }
+
+        .carousel-slide {
+            flex: 0 0 100%; /* Каждый слайд занимает 100% ширины контейнера */
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .slide-card {
+            background-color: white;
+            border: 1px solid #E0F2F1;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .slide-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 20px -3px rgba(0, 0, 0, 0.15);
+        }
+
+        .carousel-nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 20;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            padding: 0.75rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        .carousel-nav-button:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        #prev-button { left: 1rem; }
+        #next-button { right: 1rem; }
+
+        /* --- General Styling --- */
         .active-button {
             background-color: #14B8A6 !important;
             color: white !important;
@@ -56,22 +101,34 @@
         <main>
             <section id="comparison-tool" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-10 md:mb-16">
                 <div class="text-center mb-8">
-                    <h2 class="text-2xl md:text-3xl font-bold text-teal-700 mb-2">Сравнение минимального дохода</h2>
+                    <h2 class="text-2xl md:text-3xl font-bold text-teal-700 mb-2">Обзор стран: Факторы жизни и работы</h2>
                     <p class="text-gray-600 max-w-3xl mx-auto">
-                        Используйте интерактивную диаграмму для сравнения ключевого финансового требования. Нажмите на столбец страны или кнопку, чтобы открыть полную информацию о визе, стоимости жизни и пути к гражданству.
+                        Используйте карусель, чтобы быстро сравнить основные показатели стран, включая население, экономику и климат.
                     </p>
                 </div>
                 
-                <div class="chart-container mb-8">
-                    <canvas id="incomeChart"></canvas>
+                <!-- Карусель стран -->
+                <div class="carousel-container mb-8 max-w-4xl mx-auto">
+                    <div id="carousel-track" class="carousel-track h-[300px] md:h-[350px]">
+                        <!-- Слайды будут сгенерированы JavaScript -->
+                    </div>
+                    <button id="prev-button" class="carousel-nav-button text-gray-700 hover:text-teal-600">
+                        <span class="text-xl">❮</span>
+                    </button>
+                    <button id="next-button" class="carousel-nav-button text-gray-700 hover:text-teal-600">
+                        <span class="text-xl">❯</span>
+                    </button>
                 </div>
+                <!-- Конец карусели -->
 
                 <div id="country-filters" class="flex flex-wrap justify-center gap-2 md:gap-3 mb-8">
+                    <!-- Кнопки-фильтры будут сгенерированы JavaScript -->
                 </div>
             </section>
 
             <section id="details-view" class="min-h-[600px] transition-opacity duration-500">
                 <div id="details-content" class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+                    <!-- Детали будут загружены сюда -->
                 </div>
             </section>
             
@@ -111,6 +168,11 @@
     </div>
 
     <script>
+        let currentIndex = 0;
+        const carouselTrack = document.getElementById('carousel-track');
+        const countryFiltersContainer = document.getElementById('country-filters');
+        const detailsContent = document.getElementById('details-content');
+
         const visaData = [
             {
                 id: 'portugal',
@@ -130,7 +192,12 @@
                 safety: 'Очень высокая. Страна занимает одно из первых мест в мире по уровню безопасности.',
                 citizenship: '5 лет проживания с ВНЖ, затем подача на гражданство (требуется знание языка).',
                 venue: 'Консульство Португалии в стране проживания.',
-                processTime: '60-90 дней.'
+                processTime: '60-90 дней.',
+                // Новые данные для карусели
+                population: '10.3 млн',
+                economy: '~€25k ВВП/чел',
+                climate: 'Средиземноморский, мягкий',
+                english: 'Выше среднего (65%)'
             },
             {
                 id: 'spain',
@@ -150,7 +217,11 @@
                 safety: 'Высокая. Основные риски — мелкое воровство в туристических зонах.',
                 citizenship: '5 лет проживания с ВНЖ, затем подача на ПМЖ. Для гражданства нужно 10 лет легального проживания.',
                 venue: 'Консульство Испании в стране проживания.',
-                processTime: '45-60 дней.'
+                processTime: '45-60 дней.',
+                population: '47.5 млн',
+                economy: '~€30k ВВП/чел',
+                climate: 'Разнообразный, теплый',
+                english: 'Средний (55%)'
             },
             {
                 id: 'italy',
@@ -170,7 +241,11 @@
                 safety: 'Средняя, но очень безопасна в северных регионах. Низкий уровень насильственных преступлений.',
                 citizenship: '5 лет ВНЖ, затем 10 лет легального проживания для подачи на гражданство (требуется знание языка).',
                 venue: 'Консульство Италии или Посольство в стране проживания.',
-                processTime: '60-120 дней (зависит от консульства).'
+                processTime: '60-120 дней (зависит от консульства).',
+                population: '59 млн',
+                economy: '~€35k ВВП/чел',
+                climate: 'Средиземноморский, разнообразный',
+                english: 'Низкий (48%)'
             },
             {
                 id: 'croatia',
@@ -190,7 +265,11 @@
                 safety: 'Высокая. Хорватия считается одной из самых безопасных стран для проживания.',
                 citizenship: 'Не ведет к ПМЖ и гражданству напрямую, так как не продлевается без перерыва.',
                 venue: 'Онлайн-заявление или в Консульстве/Полицейском участке Хорватии (если уже в стране).',
-                processTime: '30-45 дней.'
+                processTime: '30-45 дней.',
+                population: '3.9 млн',
+                economy: '~€20k ВВП/чел',
+                climate: 'Средиземноморский/Континентальный',
+                english: 'Высокий (70%)'
             },
             {
                 id: 'hungary',
@@ -210,7 +289,11 @@
                 safety: 'Хорошая. Будапешт безопасен, но нужно быть осторожным в туристических районах.',
                 citizenship: '5 лет проживания с ВНЖ, затем 8 лет легального проживания для подачи на гражданство.',
                 venue: 'Консульство Венгрии в стране проживания.',
-                processTime: '45-60 дней.'
+                processTime: '45-60 дней.',
+                population: '9.6 млн',
+                economy: '~€18k ВВП/чел',
+                climate: 'Континентальный, холодные зимы',
+                english: 'Ниже среднего (45%)'
             },
             {
                 id: 'greece',
@@ -230,7 +313,11 @@
                 safety: 'Средняя. В туристических местах нужно проявлять осторожность. Высокий уровень безопасности на островах.',
                 citizenship: '5 лет проживания с ВНЖ, затем подача на гражданство (требуется знание языка и интеграция).',
                 venue: 'Консульство Греции в стране проживания.',
-                processTime: '60-90 дней.'
+                processTime: '60-90 дней.',
+                population: '10.4 млн',
+                economy: '~€21k ВВП/чел',
+                climate: 'Средиземноморский, жаркое лето',
+                english: 'Средний (58%)'
             },
             {
                 id: 'malta',
@@ -250,7 +337,11 @@
                 safety: 'Высокая. Очень низкий уровень преступности, особенно в жилых районах.',
                 citizenship: 'Не ведет к гражданству, но позволяет получить ВНЖ и оставаться в стране, пока сохраняется статус кочевника.',
                 venue: 'Онлайн-заявление через программу "Nomad Residence Malta".',
-                processTime: '15-30 дней (быстрый процесс).'
+                processTime: '15-30 дней (быстрый процесс).',
+                population: '0.5 млн',
+                economy: '~€30k ВВП/чел',
+                climate: 'Субтропический, очень тепло',
+                english: 'Очень высокий (80%)'
             },
             {
                 id: 'germany',
@@ -270,19 +361,105 @@
                 safety: 'Очень высокая. Одна из самых безопасных стран Западной Европы.',
                 citizenship: '5 лет проживания с ВНЖ, затем подача на гражданство (требуется знание языка B1 и тест на интеграцию).',
                 venue: 'Консульство Германии в стране проживания, затем Иммиграционный офис (Ausländerbehörde) в Германии.',
-                processTime: '30 дней (для первичной визы D) + 4-6 месяцев (для ВНЖ на месте).'
+                processTime: '30 дней (для первичной визы D) + 4-6 месяцев (для ВНЖ на месте).',
+                population: '84 млн',
+                economy: '~€50k ВВП/чел',
+                climate: 'Умеренно-морской, прохладный',
+                english: 'Очень высокий (75%)'
             }
         ];
-
-        const countryFiltersContainer = document.getElementById('country-filters');
-        const detailsContent = document.getElementById('details-content');
-        const ctx = document.getElementById('incomeChart').getContext('2d');
-        let incomeChart;
 
         function formatIncome(value) {
             if (value === null) return 'Гибкие требования';
             return `€${value.toLocaleString('ru-RU')}`;
         }
+
+        function showSlide(index) {
+            if (index >= visaData.length) {
+                currentIndex = 0;
+            } else if (index < 0) {
+                currentIndex = visaData.length - 1;
+            } else {
+                currentIndex = index;
+            }
+
+            const offset = -currentIndex * 100;
+            carouselTrack.style.transform = `translateX(${offset}%)`;
+
+            // Синхронизация с нижним блоком деталей
+            updateDetails(visaData[currentIndex].id);
+        }
+
+        function nextSlide() {
+            showSlide(currentIndex + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentIndex - 1);
+        }
+
+        function createCarousel() {
+            carouselTrack.innerHTML = '';
+            visaData.forEach((country, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'carousel-slide';
+                slide.setAttribute('data-index', index);
+                
+                // Внутреннее содержимое карточки
+                slide.innerHTML = `
+                    <div class="slide-card p-6 md:p-8">
+                        <div>
+                            <div class="flex items-center justify-between mb-4 border-b pb-3">
+                                <h3 class="text-2xl font-bold text-teal-800">${country.flag} ${country.name}</h3>
+                                <div class="text-lg font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full shadow-md">
+                                    ${formatIncome(country.income)} <span class="text-sm font-normal text-amber-600"> / мес.</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 text-sm md:text-base">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-teal-600">👥</span>
+                                    <div>
+                                        <p class="font-semibold text-gray-700">Население:</p>
+                                        <p class="text-gray-500">${country.population}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-teal-600">💰</span>
+                                    <div>
+                                        <p class="font-semibold text-gray-700">Экономика (ВВП):</p>
+                                        <p class="text-gray-500">${country.economy}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-teal-600">☀️</span>
+                                    <div>
+                                        <p class="font-semibold text-gray-700">Климат:</p>
+                                        <p class="text-gray-500">${country.climate}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-teal-600">🗣️</span>
+                                    <div>
+                                        <p class="font-semibold text-gray-700">Англ. язык (EF):</p>
+                                        <p class="text-gray-500">${country.english}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-center">
+                            <button data-country="${country.id}" class="update-detail-btn px-6 py-2 bg-teal-600 text-white rounded-full font-semibold hover:bg-teal-700 transition-colors shadow-md">
+                                Показать подробнее
+                            </button>
+                        </div>
+                    </div>
+                `;
+                carouselTrack.appendChild(slide);
+            });
+        }
+
+        // ------------------ Функции для отображения деталей (остались прежними) ------------------
 
         function createFinanceTabContent(country) {
             return `
@@ -304,7 +481,10 @@
                     </div>
                 </div>
 
-                <h4 class="text-xl font-bold text-gray-700 mt-8 mb-4 border-b pb-2">Оценочная стоимость жизни (мес.)</h4>
+                <h4 class="text-xl font-bold text-gray-700 mt-8 mb-2 border-b pb-2">Оценочная стоимость жизни (мес.)</h4>
+                <p class="text-sm text-gray-600 mb-4">
+                    Расчет стоимости без учета аренды включает: <strong class="text-teal-700">продукты питания, коммунальные услуги, интернет, мобильную связь, базовые развлечения и транспорт.</strong>
+                </p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-3">
                         <p class="text-lg font-semibold text-gray-800">Без учета аренды</p>
@@ -429,72 +609,32 @@
                 detailsContent.parentElement.style.opacity = 1;
             }, 300);
 
+            // Обновление кнопок фильтров
             document.querySelectorAll('#country-filters button').forEach(btn => {
                 btn.classList.remove('active-button');
                 if (btn.dataset.country === countryId) {
                     btn.classList.add('active-button');
                 }
             });
-        }
-
-        function createChart() {
-            const chartData = visaData.filter(c => c.income !== null);
-            
-            incomeChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartData.map(c => c.name),
-                    datasets: [{
-                        label: 'Минимальный ежемесячный доход (€)',
-                        data: chartData.map(c => c.income),
-                        backgroundColor: 'rgba(20, 184, 166, 0.7)',
-                        borderColor: 'rgba(15, 118, 110, 1)',
-                        borderWidth: 1,
-                        borderRadius: 4,
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return ` ${context.dataset.label}: ${formatIncome(context.raw)}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Сумма в евро (€)'
-                            }
-                        }
-                    },
-                    onClick: (event) => {
-                       const points = incomeChart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
-                        if (points.length) {
-                            const firstPoint = points[0];
-                            const label = incomeChart.data.labels[firstPoint.index];
-                            const country = visaData.find(c => c.name === label);
-                            if (country) {
-                                updateDetails(country.id);
-                                 document.getElementById('details-view').scrollIntoView({ behavior: 'smooth' });
-                            }
-                        }
-                    }
-                }
-            });
+            // Обновление состояния карусели
+            const newIndex = visaData.findIndex(c => c.id === countryId);
+            if (newIndex !== -1 && newIndex !== currentIndex) {
+                currentIndex = newIndex;
+                showSlide(currentIndex);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+
+            createCarousel();
+            showSlide(0); // Инициализация первого слайда и деталей
+
+            prevButton.addEventListener('click', prevSlide);
+            nextButton.addEventListener('click', nextSlide);
+
+            // Создание кнопок-фильтров под каруселью
             visaData.forEach(country => {
                 const button = document.createElement('button');
                 button.className = 'px-4 py-2 text-sm md:text-base font-medium text-teal-700 bg-white border border-teal-200 rounded-full hover:bg-teal-50 transition-colors duration-200';
@@ -505,9 +645,15 @@
                 });
                 countryFiltersContainer.appendChild(button);
             });
-
-            createChart();
-            updateDetails(visaData[0].id);
+            
+            // Обработчик клика для кнопок "Показать подробнее" в карусели
+            document.querySelectorAll('.update-detail-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const countryId = e.target.dataset.country;
+                    updateDetails(countryId);
+                    document.getElementById('details-view').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
         });
     </script>
 </body>
